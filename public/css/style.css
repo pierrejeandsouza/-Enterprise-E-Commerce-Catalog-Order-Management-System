@@ -1,0 +1,46 @@
+body {
+  background-color: #f7f8fa;
+}
+
+.view {
+  min-height: 60vh;
+}
+
+.product-card {
+  height: 100%;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.product-card .card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card .price {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.stat-card {
+  border-left: 4px solid #0d6efd;
+}
+
+.status-badge-Placed { background-color: #6c757d; }
+.status-badge-Confirmed { background-color: #0d6efd; }
+.status-badge-Shipped { background-color: #fd7e14; }
+.status-badge-Delivered { background-color: #198754; }
+.status-badge-Cancelled { background-color: #dc3545; }
+
+.low-stock {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+#toastHost {
+  z-index: 1080;
+}

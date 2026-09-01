@@ -22,7 +22,7 @@ A multi-vendor retail company needs a backend platform to manage its product cat
 - **Validation:** Joi (request body/query validation middleware)
 - **Error handling:** centralized Express error-handling middleware, consistent JSON error shape
 - **API testing/docs:** Postman collection (`postman/P01-Ecommerce.postman_collection.json`)
-- **Frontend:** none included (Postman-only demonstration, per the project's scope notes)
+- **Frontend:** vanilla HTML/CSS/JS + Bootstrap 5, served as static files from `public/` by Express itself (`app.use(express.static('public'))` in `server.js`) — talks to the API purely over `fetch()`, no build step
 
 ## Setup Instructions
 
@@ -43,8 +43,8 @@ A multi-vendor retail company needs a backend platform to manage its product cat
    # or
    npm start       # plain node
    ```
-5. The API is served at `http://localhost:5000/api`. `GET http://localhost:5000/` is a plain health check.
-6. Import `postman/P01-Ecommerce.postman_collection.json` into Postman. Run **Auth → Register** first (it auto-saves the JWT into the collection's `token` variable for the rest of the requests).
+5. The API is served at `http://localhost:5000/api` (`GET /api/health` is a plain health check). Open `http://localhost:5000/` in a browser for the demo frontend — register/login, browse the catalog, add to cart, checkout, and (for seller/admin accounts) manage products, orders, categories and coupons.
+6. Import `postman/P01-Ecommerce.postman_collection.json` into Postman for endpoint-level testing. Run **Auth → Register** first (it auto-saves the JWT into the collection's `token` variable for the rest of the requests).
 
 ## List of Implemented Modules
 
@@ -145,7 +145,7 @@ Collections: `users`, `categories`, `products`, `carts`, `orders`, `coupons`, `r
 ## Known Limitations
 
 - Modules 13 & 14 endpoints are built from an inferred spec — see the note under "List of Implemented Modules" above.
-- No frontend UI is included; the API is demonstrated via the Postman collection, per the project's stated scope (a frontend is optional/recommended, not compulsory).
+- The included frontend (`public/`) is a functional demo, not a polished design — intentional per the project's scope notes ("visual polish is not evaluated"). It covers every module's happy path but skips things like image uploads (product `images[]` can only be set via the API/Postman today).
 - Third-party integrations (payment gateway, SMS/email) are mocked, per the assignment's stated scope.
 - Single currency/locale/timezone is assumed throughout, per the assignment's stated scope.
 
@@ -161,6 +161,7 @@ p01-ecommerce/
   utils/           -> apiResponse.js, token.js, pagination.js, AppError.js, coupon.js, validators/
   scripts/         -> boot-check.js (dependency-free scaffold smoke test)
   postman/         -> exported Postman collection
+  public/          -> demo frontend (index.html, css/, js/) served as static files
   .env.example     -> sample environment variables (no real secrets)
   server.js        -> app entry point
 ```

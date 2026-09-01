@@ -31,8 +31,17 @@ server.listen(0, async () => {
     results.push({ label, status: res.status, json });
   }
 
-  await call('root route', 'GET', '/');
+  await call('api health check', 'GET', '/api/health');
   await call('unknown route -> 404 JSON', 'GET', '/api/does-not-exist');
+
+  // Static frontend: GET / should serve public/index.html, not JSON
+  const rootRes = await fetch(base + '/');
+  const rootHtml = await rootRes.text();
+  results.push({
+    label: 'root route serves frontend HTML',
+    status: rootRes.status,
+    json: { success: rootRes.status === 200 && rootHtml.includes('P01 Store') },
+  });
   await call('register missing fields -> 400 (validation runs before DB)', 'POST', '/api/auth/register', { email: 'not-an-email' });
   await call('login missing fields -> 400', 'POST', '/api/auth/login', {});
   await call('protected route no token -> 401', 'POST', '/api/categories', { name: 'X' });

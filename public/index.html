@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P01 — E-Commerce Catalog &amp; Order Management</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#" data-view="catalog">P01 Store</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="#" data-view="catalog">Catalog</a></li>
+          <li class="nav-item auth-only d-none"><a class="nav-link" href="#" data-view="cart">Cart <span id="cartCount" class="badge bg-secondary"></span></a></li>
+          <li class="nav-item auth-only d-none"><a class="nav-link" href="#" data-view="orders">My Orders</a></li>
+          <li class="nav-item role-seller d-none"><a class="nav-link" href="#" data-view="seller">Seller Dashboard</a></li>
+          <li class="nav-item role-admin d-none"><a class="nav-link" href="#" data-view="admin">Admin</a></li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item guest-only"><a class="nav-link" href="#" data-view="login">Login</a></li>
+          <li class="nav-item guest-only"><a class="nav-link" href="#" data-view="register">Register</a></li>
+          <li class="nav-item auth-only d-none">
+            <span class="nav-link disabled" id="whoami"></span>
+          </li>
+          <li class="nav-item auth-only d-none"><a class="nav-link" href="#" id="logoutBtn">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="toastHost" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+  <main class="container py-4">
+
+    <!-- CATALOG -->
+    <section id="view-catalog" class="view">
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-4">
+          <label class="form-label small">Search</label>
+          <input type="text" id="searchKeyword" class="form-control" placeholder="Search products...">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Category</label>
+          <select id="filterCategory" class="form-select">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Sort</label>
+          <select id="sortBy" class="form-select">
+            <option value="">Newest</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating_desc">Top Rated</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary w-100" id="searchBtn">Apply Filters</button>
+        </div>
+      </div>
+      <div id="productGrid" class="row g-3"></div>
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center" id="pagination"></ul>
+      </nav>
+    </section>
+
+    <!-- PRODUCT DETAIL -->
+    <section id="view-product" class="view d-none">
+      <div id="productDetail"></div>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="view-login" class="view d-none">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title mb-3">Login</h4>
+              <form id="loginForm">
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" name="email" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Password</label>
+                  <input type="password" class="form-control" name="password" required>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Login</button>
+              </form>
+              <p class="mt-3 mb-0 small text-muted">No account? <a href="#" data-view="register">Register here</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTER -->
+    <section id="view-register" class="view d-none">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title mb-3">Create an account</h4>
+              <form id="registerForm">
+                <div class="mb-3">
+                  <label class="form-label">Name</label>
+                  <input type="text" class="form-control" name="name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" name="email" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Password</label>
+                  <input type="password" class="form-control" name="password" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">I am a</label>
+                  <select class="form-select" name="role">
+                    <option value="customer">Customer</option>
+                    <option value="seller">Seller</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Register</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CART -->
+    <section id="view-cart" class="view d-none">
+      <h4 class="mb-3">Your Cart</h4>
+      <div id="cartItems"></div>
+      <div class="card mt-3">
+        <div class="card-body">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+              <label class="form-label small">Shipping Address</label>
+              <input type="text" id="shipLine1" class="form-control mb-1" placeholder="Address line 1">
+              <div class="row g-1">
+                <div class="col"><input type="text" id="shipCity" class="form-control" placeholder="City"></div>
+                <div class="col"><input type="text" id="shipState" class="form-control" placeholder="State"></div>
+                <div class="col"><input type="text" id="shipZip" class="form-control" placeholder="Postal Code"></div>
+                <div class="col"><input type="text" id="shipCountry" class="form-control" placeholder="Country"></div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">Coupon Code (optional)</label>
+              <input type="text" id="couponCode" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-success w-100" id="placeOrderBtn">Place Order</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="view-orders" class="view d-none">
+      <h4 class="mb-3">My Orders</h4>
+      <div id="ordersList"></div>
+    </section>
+
+    <!-- SELLER DASHBOARD -->
+    <section id="view-seller" class="view d-none">
+      <h4 class="mb-3">Seller Dashboard</h4>
+      <div class="row g-3 mb-4" id="sellerStats"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5>My Products</h5>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#productModal" id="newProductBtn">+ New Product</button>
+      </div>
+      <div id="sellerProducts"></div>
+
+      <h5 class="mt-4">Orders on My Listings</h5>
+      <div id="sellerOrders"></div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="view-admin" class="view d-none">
+      <h4 class="mb-3">Admin Console</h4>
+      <div class="row g-3 mb-4" id="adminStats"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5>Categories</h5>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">+ New Category</button>
+      </div>
+      <div id="adminCategories" class="mb-4"></div>
+
+      <h5>All Orders</h5>
+      <div id="adminOrders" class="mb-4"></div>
+
+      <h5>Coupons</h5>
+      <button class="btn btn-sm btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#couponModal">+ New Coupon</button>
+      <div id="adminCoupons"></div>
+    </section>
+
+  </main>
+
+  <!-- Product create/edit modal -->
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">New Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="productForm">
+            <div class="mb-2"><label class="form-label small">Name</label><input class="form-control" name="name" required></div>
+            <div class="mb-2"><label class="form-label small">Description</label><textarea class="form-control" name="description" required></textarea></div>
+            <div class="mb-2"><label class="form-label small">Category</label><select class="form-select" name="categoryId" id="productCategorySelect" required></select></div>
+            <div class="row">
+              <div class="col mb-2"><label class="form-label small">Price</label><input type="number" step="0.01" class="form-control" name="price" required></div>
+              <div class="col mb-2"><label class="form-label small">Stock</label><input type="number" class="form-control" name="stock" required></div>
+            </div>
+            <button class="btn btn-primary w-100 mt-2" type="submit">Save Product</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category modal -->
+  <div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">New Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="categoryForm">
+            <div class="mb-2"><label class="form-label small">Name</label><input class="form-control" name="name" required></div>
+            <div class="mb-2"><label class="form-label small">Parent Category (optional)</label><select class="form-select" name="parentCategoryId" id="parentCategorySelect"><option value="">None</option></select></div>
+            <button class="btn btn-primary w-100 mt-2" type="submit">Save Category</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coupon modal -->
+  <div class="modal fade" id="couponModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">New Coupon</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="couponForm">
+            <div class="mb-2"><label class="form-label small">Code</label><input class="form-control text-uppercase" name="code" required></div>
+            <div class="row">
+              <div class="col mb-2"><label class="form-label small">Type</label>
+                <select class="form-select" name="discountType">
+                  <option value="percentage">Percentage</option>
+                  <option value="flat">Flat</option>
+                </select>
+              </div>
+              <div class="col mb-2"><label class="form-label small">Value</label><input type="number" class="form-control" name="value" required></div>
+            </div>
+            <div class="row">
+              <div class="col mb-2"><label class="form-label small">Valid Till</label><input type="date" class="form-control" name="validTill" required></div>
+              <div class="col mb-2"><label class="form-label small">Min Order Value</label><input type="number" class="form-control" name="minOrderValue" value="0"></div>
+            </div>
+            <button class="btn btn-primary w-100 mt-2" type="submit">Save Coupon</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review modal -->
+  <div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Rate this product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reviewForm">
+            <input type="hidden" name="orderId">
+            <div class="mb-2">
+              <label class="form-label small">Rating (1-5)</label>
+              <input type="number" min="1" max="5" class="form-control" name="rating" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">Comment</label>
+              <textarea class="form-control" name="comment"></textarea>
+            </div>
+            <button class="btn btn-primary w-100 mt-2" type="submit">Submit Review</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
